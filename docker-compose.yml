@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.1.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: JwQd97Eoy2gtJwQdgEh7p8agEhMYm1
+      MYSQL_DATABASE: 
+    networks:
+      - network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  svelte-app:
+    build: .
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.production
+    depends_on:
+      - mysql
+    networks:
+      - network
+    volumes:
+      - documents:/usr/src/app/documents
+
+  caddy:
+    image: caddy:latest
+    restart: always
+    ports:
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - network
+    depends_on:
+      - svelte-app
+
+volumes:
+  mysql_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+  documents:
+    driver: local
+
+networks:
+  network:
+    driver: bridge

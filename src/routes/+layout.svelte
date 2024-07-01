@@ -1,9 +1,10 @@
 <script lang="ts">
 	import '$styles/app.css';
-
-	import Toast from '$lib/components/Toast.svelte';
+	import { ModeWatcher } from "mode-watcher";
+	import { Toaster } from "$lib/components/ui/sonner";
 </script>
 
-<Toast />
 
+<Toaster />
+<ModeWatcher />
 <slot />

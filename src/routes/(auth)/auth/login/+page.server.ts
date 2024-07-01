@@ -2,31 +2,27 @@ import { getUserByEmail } from '$lib/drizzle/mysql/models/users';
 import { fail, redirect } from '@sveltejs/kit';
 import { message, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { z } from 'zod';
 import { lucia } from '$lib/lucia/mysql.js';
 import { Argon2id } from 'oslo/password';
+import { loginSchema } from './schema';
 
 export const load = async ({ locals }) => {
 	const { session } = locals;
 
 	if (session) {
-		redirect(302, '/app/profile');
+		redirect(302, '/');
 	}
 
-	const form = await superValidate(zod(loginUserSchema));
+	const loginForm = await superValidate(zod(loginSchema));
 
-	return { form };
+	return { loginForm };
 };
 
-const loginUserSchema = z.object({
-	email: z.string().email(),
-	password: z.string().min(1)
-});
 
 export const actions = {
 	loginUser: async ({ cookies, request }) => {
 
-		const form = await superValidate(request, zod(loginUserSchema));
+		const form = await superValidate(request, zod(loginSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
